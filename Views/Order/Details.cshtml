@@ -1,0 +1,64 @@
+@using CQRS.CRUD.Domain
+@model OrderDto
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Order</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.CustomerName)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.CustomerName)
+        </dd>
+    </dl>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.OrderDate)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.OrderDate)
+        </dd>
+    </dl>
+        
+        @Html.DisplayNameFor(model => model.OrderItems)
+        
+        <dd class="col-sm-10"></dd>
+            <table class="table table-bordered">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Unit Price</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.OrderItems)
+                    {
+                        <tr>
+                            <td>@Html.DisplayFor(modelItem => item.ProductName)</td>
+                            <td>@Html.DisplayFor(modelItem => item.Quantity)</td>
+                            <td>@Html.DisplayFor(modelItem => item.Price)</td>
+                            <td>@((item.Quantity * item.Price).ToString("C"))</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr class="font-weight-bold">
+                        <td colspan="3" class="text-right">Grand Total:</td>
+                        <td>@Model.OrderItems.Sum(i => i.Quantity * i.Price).ToString("C")</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>

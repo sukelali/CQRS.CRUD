@@ -1,0 +1,120 @@
+@model CQRS.CRUD.Application.Command.Order.CreateOrderCommand;
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Order</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create" asp-controller="Order" method="post" >
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <label asp-for="CustomerName" class="control-label"></label>
+                <input asp-for="CustomerName" class="form-control" />
+                <span asp-validation-for="CustomerName" class="text-danger"></span>
+            </div>
+
+            <h4>Order Items</h4>
+            <div id="orderItemsContainer">
+                @for (var i = 0; i < Model.OrderItems.Count; i++)
+                {
+                    <div class="order-item-row mb-3 border p-2">
+                        <div class="form-group">
+                            <label asp-for="@Model.OrderItems[i].ProductName" class="control-label">Product Name</label>
+                            <input asp-for="@Model.OrderItems[i].ProductName" class="form-control" />
+                            <span asp-validation-for="@Model.OrderItems[i].ProductName" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="@Model.OrderItems[i].Quantity" class="control-label"></label>
+                            <input asp-for="@Model.OrderItems[i].Quantity" class="form-control" />
+                            <span asp-validation-for="@Model.OrderItems[i].Quantity" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="@Model.OrderItems[i].Price" class="control-label"></label>
+                            <input asp-for="@Model.OrderItems[i].Price" class="form-control" />
+                            <span asp-validation-for="@Model.OrderItems[i].Price" class="text-danger"></span>
+                        </div>
+                        <button type="button" class="btn btn-danger remove-item">Remove</button>
+                    </div>
+                }
+            </div>
+
+            <button type="button" id="addItem" class="btn btn-secondary mb-3">Add Item</button>
+
+
+            <br />
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Add new item
+            $("#addItem").click(function() {
+                var index = $("#orderItemsContainer .order-item-row").length;
+                var template = `
+                    <div class="order-item-row mb-3 border p-2">
+                        <div class="form-group">
+                            <label class="control-label">Product Name</label>
+                            <input name="OrderItems[${index}].ProductName" class="form-control" />
+                            <span class="text-danger field-validation-valid" 
+                                  data-valmsg-for="OrderItems[${index}].ProductName" 
+                                  data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">Quantity</label>
+                            <input name="OrderItems[${index}].Quantity" class="form-control" />
+                            <span class="text-danger field-validation-valid" 
+                                  data-valmsg-for="OrderItems[${index}].Quantity" 
+                                  data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">Price</label>
+                            <input name="OrderItems[${index}].Price" class="form-control" />
+                            <span class="text-danger field-validation-valid" 
+                                  data-valmsg-for="OrderItems[${index}].Price" 
+                                  data-valmsg-replace="true"></span>
+                        </div>
+                        <button type="button" class="btn btn-danger remove-item">Remove</button>
+                    </div>
+                `;
+                $("#orderItemsContainer").append(template);
+            });
+
+            // Remove item
+            $(document).on('click', '.remove-item', function() {
+                $(this).closest('.order-item-row').remove();
+                updateIndexes();
+            });
+
+            // Update indexes after removal to maintain proper model binding
+            function updateIndexes() {
+                $('#orderItemsContainer .order-item-row').each(function(index) {
+                    $(this).find('input').each(function() {
+                        var name = $(this).attr('name')
+                            .replace(/\[\d+\]/, '[' + index + ']');
+                        $(this).attr('name', name);
+                    });
+                    $(this).find('span').each(function() {
+                        var forAttr = $(this).attr('data-valmsg-for')
+                            .replace(/\[\d+\]/, '[' + index + ']');
+                        $(this).attr('data-valmsg-for', forAttr);
+                    });
+                });
+            }
+        });
+    </script>
+}
